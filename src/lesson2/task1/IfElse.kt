@@ -71,16 +71,16 @@ fun minBiRoot(a: Double, b: Double, c: Double): Double {
  * вернуть строку вида: «21 год», «32 года», «12 лет».
  */
 fun ageDescription(age: Int): String {
-    var res = ""
-    if (age % 100 in 11..14) res = "лет"
-    else
-        when (age % 10) {
-            0 -> res = "лет"
-            1 -> res = "год"
-            in 2..4 -> res = "года"
-            in 5..9 -> res = "лет"
+    val result =
+        if (age % 100 in 11..14) "лет"
+        else when (age % 10) {
+            0 -> "лет"
+            1 -> "год"
+            in 2..4 -> "года"
+            in 5..9 -> "лет"
+            else -> "Что-то пошло не так"
         }
-    return "$age $res"
+    return "$age $result"
 }
 
 /**
@@ -130,10 +130,10 @@ fun whichRookThreatens(
 ): Int {
     val isAttacked1 = (kingX == rookX1) || (kingY == rookY1)
     val isAttacked2 = (kingX == rookX2) || (kingY == rookY2)
-    if (isAttacked1 && isAttacked2) return 3
-    else if (isAttacked1) return 1
-    else if (isAttacked2) return 2
-    else return 0
+    return if (isAttacked1 && isAttacked2) 3
+    else if (isAttacked1) 1
+    else if (isAttacked2) 2
+    else 0
 }
 
 /**
@@ -153,10 +153,10 @@ fun rookOrBishopThreatens(
 ): Int {
     val isAttacked1 = (kingX == rookX) || (kingY == rookY)
     val isAttacked2 = abs(bishopX - kingX) == abs(bishopY - kingY)
-    if (isAttacked1 && isAttacked2) return 3
-    else if (isAttacked1) return 1
-    else if (isAttacked2) return 2
-    else return 0
+    return if (isAttacked1 && isAttacked2) 3
+    else if (isAttacked1) 1
+    else if (isAttacked2) 2
+    else 0
 }
 
 /**
@@ -172,13 +172,11 @@ fun triangleKind(a: Double, b: Double, c: Double): Int {
     val cosB = (sqr(a) + sqr(c) - sqr(b)) / (2 * a * c)
     val cosC = (sqr(a) + sqr(b) - sqr(c)) / (2 * b * a)
     val cosMultiplication = cosA * cosB * cosC
-    if ((abs(cosA) > 1) || (abs(cosB) > 1) || (abs(cosC) > 1)) return -1
-    else {
-        if (cosMultiplication > 0) return 0
-        else if (cosMultiplication == 0.0) return 1
-        else if (cosMultiplication < 0) return 2
-        else return 123
-    }
+    return if ((abs(cosA) > 1) || (abs(cosB) > 1) || (abs(cosC) > 1)) -1
+    else if (cosMultiplication > 0) 0
+    else if (cosMultiplication == 0.0) 1
+    else if (cosMultiplication < 0) 2
+    else 123
 }
 
 /**
@@ -190,11 +188,11 @@ fun triangleKind(a: Double, b: Double, c: Double): Int {
  * Если пересечения нет, вернуть -1.
  */
 fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
-    if (a < b && b < c && c < d) return -1
-    else if (c < d && d < a && a < b) return -1
-    else if (a <= c && c <= b && b <= d) return abs(c - b)
-    else if (c <= a && a <= b && b <= d) return abs(a - b)
-    else if (c <= a && a <= d && d <= b) return abs(a - d)
-    else if (a <= c && c <= d && d <= b) return abs(c - d)
-    else return -1
+    return if (b < c) -1
+    else if (d < a) -1
+    else if (c in a..b && b <= d) abs(c - b)
+    else if (a in c..b && b <= d) abs(a - b)
+    else if (a in c..d && d <= b) abs(a - d)
+    else if (c in a..d && d <= b) abs(c - d)
+    else -1
 }

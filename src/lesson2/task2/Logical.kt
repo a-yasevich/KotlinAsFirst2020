@@ -41,13 +41,13 @@ fun queenThreatens(x1: Int, y1: Int, x2: Int, y2: Int): Boolean =
  */
 fun daysInMonth(month: Int, year: Int): Int {
     val isLeap = (year % 4 == 0) && !((year % 100 == 0) && (year % 400 != 0))
-    when (month) {
-        1, 3, 5, 7, 8, 10, 12 -> return 31
-        4, 6, 9, 11 -> return 30
+    return when (month) {
+        1, 3, 5, 7, 8, 10, 12 -> 31
+        4, 6, 9, 11 -> 30
         2 ->
-            if (isLeap) return 29
-            else return 28
-        else -> return 0
+            if (isLeap) 29
+            else 28
+        else -> 0
     }
 }
 

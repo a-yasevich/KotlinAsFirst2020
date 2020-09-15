@@ -2,6 +2,7 @@
 
 package lesson3.task1
 
+import kotlin.math.abs
 import kotlin.math.sqrt
 
 // Урок 3: циклы
@@ -74,7 +75,7 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  */
 fun digitNumber(n: Int): Int {
     var k = 1
-    var nCopy = n
+    var nCopy = abs(n)
     nCopy /= 10
     while (nCopy > 0) {
         nCopy /= 10
@@ -224,15 +225,8 @@ fun revert(n: Int): Int {
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun isPalindrome(n: Int): Boolean {
-    var nReverted = revert(n)
-    var nCopy = n
-    while (nCopy > 0) {
-        if (nCopy % 10 != nReverted % 10)
-            return false
-        nCopy /= 10
-        nReverted /= 10
-    }
-    return true
+    val nReverted = revert(n)
+    return nReverted == n
 }
 
 /**
@@ -245,14 +239,10 @@ fun isPalindrome(n: Int): Boolean {
  */
 fun hasDifferentDigits(n: Int): Boolean {
     var nCopy = n
-    var currentNumber = nCopy % 10
-    var previousNumber: Int
     while (nCopy > 9) {
-        previousNumber = currentNumber
-        nCopy /= 10
-        currentNumber = nCopy % 10
-        if (previousNumber != currentNumber)
+        if (nCopy % 10 != (nCopy / 10) % 10)
             return true
+        nCopy /= 10
     }
     return false
 }
