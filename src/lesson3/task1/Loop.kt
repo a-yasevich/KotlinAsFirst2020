@@ -3,6 +3,7 @@
 package lesson3.task1
 
 import kotlin.math.abs
+import kotlin.math.pow
 import kotlin.math.sqrt
 
 // Урок 3: циклы
@@ -153,10 +154,10 @@ fun collatzSteps(x: Int): Int {
     var k = 0
     while (currentNum != 1) {
         previousNum = currentNum
-        if (previousNum % 2 == 0)
-            currentNum = previousNum / 2
+        currentNum = if (previousNum % 2 == 0)
+            previousNum / 2
         else
-            currentNum = 3 * previousNum + 1
+            3 * previousNum + 1
         k++
     }
     return k
@@ -278,7 +279,18 @@ fun cos(x: Double, eps: Double): Double = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun squareSequenceDigit(n: Int): Int = TODO()
+fun squareSequenceDigit(n: Int): Int {
+    var numeralsPassed = 0
+    var k = 0
+    var currentNum = 0
+    while (numeralsPassed < n) {
+        k++
+        currentNum = k * k
+        numeralsPassed += digitNumber(currentNum)
+    }
+    val requiredNumberOfReverseSteps = numeralsPassed - n
+    return getNumeral(currentNum, digitNumber(currentNum) - requiredNumberOfReverseSteps)
+}
 
 /**
  * Сложная (5 баллов)
@@ -303,5 +315,5 @@ fun fibSequenceDigit(n: Int): Int {
 }
 
 fun getNumeral(number: Int, i: Int): Int =
-    (number / (Math.pow(10.0, (digitNumber(number) - i).toDouble())).toInt()) % 10
+    (number / (10.0.pow((digitNumber(number) - i).toDouble())).toInt()) % 10
 

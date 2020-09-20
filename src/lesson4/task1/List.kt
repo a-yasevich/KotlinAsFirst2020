@@ -3,6 +3,7 @@
 package lesson4.task1
 
 import lesson1.task1.discriminant
+import kotlin.math.pow
 import kotlin.math.sqrt
 
 // Урок 4: списки
@@ -120,14 +121,27 @@ fun buildSumExample(list: List<Int>) = list.joinToString(separator = " + ", post
  * по формуле abs = sqrt(a1^2 + a2^2 + ... + aN^2).
  * Модуль пустого вектора считать равным 0.0.
  */
-fun abs(v: List<Double>): Double = TODO()
+fun abs(v: List<Double>): Double {
+    var res = 0.0
+    for (i in v) {
+        res += i * i
+    }
+    return sqrt(res)
+}
 
 /**
  * Простая (2 балла)
  *
  * Рассчитать среднее арифметическое элементов списка list. Вернуть 0.0, если список пуст
  */
-fun mean(list: List<Double>): Double = TODO()
+fun mean(list: List<Double>): Double {
+    var sum = 0.0
+    for (i in list)
+        sum += i
+    return if (list.isNotEmpty())
+        sum / list.size
+    else 0.0
+}
 
 /**
  * Средняя (3 балла)
@@ -137,7 +151,11 @@ fun mean(list: List<Double>): Double = TODO()
  *
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
-fun center(list: MutableList<Double>): MutableList<Double> = TODO()
+fun center(list: MutableList<Double>): MutableList<Double> {
+    for (i in 0 until list.size)
+        list[i] -= mean(list)
+    return list
+}
 
 /**
  * Средняя (3 балла)
@@ -146,7 +164,12 @@ fun center(list: MutableList<Double>): MutableList<Double> = TODO()
  * представленные в виде списков a и b. Скалярное произведение считать по формуле:
  * C = a1b1 + a2b2 + ... + aNbN. Произведение пустых векторов считать равным 0.
  */
-fun times(a: List<Int>, b: List<Int>): Int = TODO()
+fun times(a: List<Int>, b: List<Int>): Int {
+    var c = 0
+    for (i in 0 until a.size)
+        c += a[i] * b[i]
+    return c
+}
 
 /**
  * Средняя (3 балла)
@@ -156,7 +179,13 @@ fun times(a: List<Int>, b: List<Int>): Int = TODO()
  * Коэффициенты многочлена заданы списком p: (p0, p1, p2, p3, ..., pN).
  * Значение пустого многочлена равно 0 при любом x.
  */
-fun polynom(p: List<Int>, x: Int): Int = TODO()
+fun polynom(p: List<Int>, x: Int): Int {
+    var res = 0
+    for (i in 0 until p.size) {
+        res += p[i] * ((x.toDouble()).pow(i)).toInt()
+    }
+    return res
+}
 
 /**
  * Средняя (3 балла)
@@ -168,7 +197,16 @@ fun polynom(p: List<Int>, x: Int): Int = TODO()
  *
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
-fun accumulate(list: MutableList<Int>): MutableList<Int> = TODO()
+fun accumulate(list: MutableList<Int>): MutableList<Int> {
+    var sum =
+        if (list.isNotEmpty()) list[0]
+        else 0
+    for (i in 1 until list.size) {
+        sum += list[i]
+        list[i] = sum
+    }
+    return list
+}
 
 /**
  * Средняя (3 балла)
@@ -177,7 +215,18 @@ fun accumulate(list: MutableList<Int>): MutableList<Int> = TODO()
  * Результат разложения вернуть в виде списка множителей, например 75 -> (3, 5, 5).
  * Множители в списке должны располагаться по возрастанию.
  */
-fun factorize(n: Int): List<Int> = TODO()
+fun factorize(n: Int): List<Int> {
+    var nCopy = n
+    var currentPrimeFactor = 2
+    val list = mutableListOf<Int>()
+    while (nCopy > 1) {
+        if (nCopy % currentPrimeFactor == 0) {
+            nCopy /= currentPrimeFactor
+            list.add(currentPrimeFactor)
+        } else currentPrimeFactor++
+    }
+    return list
+}
 
 /**
  * Сложная (4 балла)
@@ -186,7 +235,14 @@ fun factorize(n: Int): List<Int> = TODO()
  * Результат разложения вернуть в виде строки, например 75 -> 3*5*5
  * Множители в результирующей строке должны располагаться по возрастанию.
  */
-fun factorizeToString(n: Int): String = TODO()
+fun factorizeToString(n: Int): String {
+    val list = factorize(n)
+    var res = ""
+    for (i in 0..list.size - 2)
+        res += "${list[i]}*"
+    res += list[list.size - 1]
+    return res
+}
 
 /**
  * Средняя (3 балла)
@@ -217,7 +273,12 @@ fun convertToString(n: Int, base: Int): String = TODO()
  * из системы счисления с основанием base в десятичную.
  * Например: digits = (1, 3, 12), base = 14 -> 250
  */
-fun decimal(digits: List<Int>, base: Int): Int = TODO()
+fun decimal(digits: List<Int>, base: Int): Int {
+    var res = 0
+    for (i in 0 until digits.size)
+        res += digits[i] * ((base.toDouble()).pow(digits.size - 1 - i)).toInt()
+    return res
+}
 
 /**
  * Сложная (4 балла)
@@ -231,7 +292,12 @@ fun decimal(digits: List<Int>, base: Int): Int = TODO()
  * Использовать функции стандартной библиотеки, напрямую и полностью решающие данную задачу
  * (например, str.toInt(base)), запрещается.
  */
-fun decimalFromString(str: String, base: Int): Int = TODO()
+fun decimalFromString(str: String, base: Int): Int {
+    var res = 0
+    for (i in 0 until str.length)
+        res += Character.getNumericValue(str[i]) * ((base.toDouble()).pow(str.length - 1 - i)).toInt()
+    return res
+}
 
 /**
  * Сложная (5 баллов)
@@ -241,7 +307,68 @@ fun decimalFromString(str: String, base: Int): Int = TODO()
  * 90 = XC, 100 = C, 400 = CD, 500 = D, 900 = CM, 1000 = M.
  * Например: 23 = XXIII, 44 = XLIV, 100 = C
  */
-fun roman(n: Int): String = TODO()
+fun roman(n: Int): String {
+    var nCopy = n
+    var romanNum = ""
+    while (nCopy > 0) {
+        when {
+            nCopy - 1000 >= 0 -> {
+                nCopy -= 1000
+                romanNum += "M"
+            }
+            nCopy - 900 >= 0 -> {
+                nCopy -= 900
+                romanNum += "CM"
+            }
+            nCopy - 500 >= 0 -> {
+                nCopy -= 500
+                romanNum += "D"
+            }
+            nCopy - 400 >= 0 -> {
+                nCopy -= 400
+                romanNum += "CD"
+            }
+            nCopy - 100 >= 0 -> {
+                nCopy -= 100
+                romanNum += "C"
+            }
+            nCopy - 90 >= 0 -> {
+                nCopy -= 90
+                romanNum += "XC"
+            }
+            nCopy - 50 >= 0 -> {
+                nCopy -= 50
+                romanNum += "L"
+            }
+            nCopy - 40 >= 0 -> {
+                nCopy -= 40
+                romanNum += "XL"
+            }
+            nCopy - 10 >= 0 -> {
+                nCopy -= 10
+                romanNum += "X"
+            }
+            nCopy - 9 >= 0 -> {
+                nCopy -= 40
+                romanNum += "IX"
+            }
+            nCopy - 5 >= 0 -> {
+                nCopy -= 5
+                romanNum += "V"
+            }
+            nCopy - 4 >= 0 -> {
+                nCopy -= 4
+                romanNum += "IV"
+            }
+            nCopy - 1 >= 0 -> {
+                nCopy -= 1
+                romanNum += "I"
+            }
+        }
+
+    }
+    return romanNum
+}
 
 /**
  * Очень сложная (7 баллов)
