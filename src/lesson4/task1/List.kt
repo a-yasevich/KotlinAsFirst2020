@@ -135,11 +135,8 @@ fun abs(v: List<Double>): Double {
  * Рассчитать среднее арифметическое элементов списка list. Вернуть 0.0, если список пуст
  */
 fun mean(list: List<Double>): Double {
-    var sum = 0.0
-    for (i in list)
-        sum += i
     return if (list.isNotEmpty())
-        sum / list.size
+        list.sum() / list.size
     else 0.0
 }
 
@@ -152,11 +149,19 @@ fun mean(list: List<Double>): Double {
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
 fun center(list: MutableList<Double>): MutableList<Double> {
+    val mean = mean(list)
+    list.map { it - mean }
     for (i in 0 until list.size)
-        list[i] -= mean(list)
+        list[i] -= mean
     return list
 }
-
+/* Можно ли как-то использовать функцию map? Код ниже не работает
+{
+    val mean = mean(list)
+    list.map { it - mean }
+    return list
+}
+*/
 /**
  * Средняя (3 балла)
  *
@@ -164,12 +169,8 @@ fun center(list: MutableList<Double>): MutableList<Double> {
  * представленные в виде списков a и b. Скалярное произведение считать по формуле:
  * C = a1b1 + a2b2 + ... + aNbN. Произведение пустых векторов считать равным 0.
  */
-fun times(a: List<Int>, b: List<Int>): Int {
-    var c = 0
-    for (i in 0 until a.size)
-        c += a[i] * b[i]
-    return c
-}
+fun times(a: List<Int>, b: List<Int>): Int =
+    a.zip(b).sumBy { (first, second) -> first * second }
 
 /**
  * Средняя (3 балла)
@@ -181,8 +182,8 @@ fun times(a: List<Int>, b: List<Int>): Int {
  */
 fun polynom(p: List<Int>, x: Int): Int {
     var res = 0
-    for (i in 0 until p.size) {
-        res += p[i] * ((x.toDouble()).pow(i)).toInt()
+    for (i in p.indices) {
+        res += p[i] * x.toDouble().pow(i).toInt()
     }
     return res
 }
@@ -235,14 +236,7 @@ fun factorize(n: Int): List<Int> {
  * Результат разложения вернуть в виде строки, например 75 -> 3*5*5
  * Множители в результирующей строке должны располагаться по возрастанию.
  */
-fun factorizeToString(n: Int): String {
-    val list = factorize(n)
-    var res = ""
-    for (i in 0..list.size - 2)
-        res += "${list[i]}*"
-    res += list[list.size - 1]
-    return res
-}
+fun factorizeToString(n: Int): String = factorize(n).joinToString(separator = "*")
 
 /**
  * Средняя (3 балла)
@@ -275,8 +269,8 @@ fun convertToString(n: Int, base: Int): String = TODO()
  */
 fun decimal(digits: List<Int>, base: Int): Int {
     var res = 0
-    for (i in 0 until digits.size)
-        res += digits[i] * ((base.toDouble()).pow(digits.size - 1 - i)).toInt()
+    for (i in digits.indices)
+        res += digits[i] * base.toDouble().pow(digits.size - 1 - i).toInt()
     return res
 }
 
@@ -294,7 +288,7 @@ fun decimal(digits: List<Int>, base: Int): Int {
  */
 fun decimalFromString(str: String, base: Int): Int {
     var res = 0
-    for (i in 0 until str.length)
+    for (i in str.indices)
         res += Character.getNumericValue(str[i]) * ((base.toDouble()).pow(str.length - 1 - i)).toInt()
     return res
 }
