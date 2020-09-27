@@ -134,11 +134,9 @@ fun abs(v: List<Double>): Double {
  *
  * Рассчитать среднее арифметическое элементов списка list. Вернуть 0.0, если список пуст
  */
-fun mean(list: List<Double>): Double {
-    return if (list.isNotEmpty())
-        list.sum() / list.size
+fun mean(list: List<Double>): Double =
+    if (list.isNotEmpty()) list.sum() / list.size
     else 0.0
-}
 
 /**
  * Средняя (3 балла)
@@ -150,18 +148,11 @@ fun mean(list: List<Double>): Double {
  */
 fun center(list: MutableList<Double>): MutableList<Double> {
     val mean = mean(list)
-    list.map { it - mean }
     for (i in 0 until list.size)
         list[i] -= mean
     return list
 }
-/* Можно ли как-то использовать функцию map? Код ниже не работает
-{
-    val mean = mean(list)
-    list.map { it - mean }
-    return list
-}
-*/
+
 /**
  * Средняя (3 балла)
  *
@@ -303,65 +294,29 @@ fun decimalFromString(str: String, base: Int): Int {
  */
 fun roman(n: Int): String {
     var nCopy = n
-    var romanNum = ""
-    while (nCopy > 0) {
-        when {
-            nCopy - 1000 >= 0 -> {
-                nCopy -= 1000
-                romanNum += "M"
-            }
-            nCopy - 900 >= 0 -> {
-                nCopy -= 900
-                romanNum += "CM"
-            }
-            nCopy - 500 >= 0 -> {
-                nCopy -= 500
-                romanNum += "D"
-            }
-            nCopy - 400 >= 0 -> {
-                nCopy -= 400
-                romanNum += "CD"
-            }
-            nCopy - 100 >= 0 -> {
-                nCopy -= 100
-                romanNum += "C"
-            }
-            nCopy - 90 >= 0 -> {
-                nCopy -= 90
-                romanNum += "XC"
-            }
-            nCopy - 50 >= 0 -> {
-                nCopy -= 50
-                romanNum += "L"
-            }
-            nCopy - 40 >= 0 -> {
-                nCopy -= 40
-                romanNum += "XL"
-            }
-            nCopy - 10 >= 0 -> {
-                nCopy -= 10
-                romanNum += "X"
-            }
-            nCopy - 9 >= 0 -> {
-                nCopy -= 40
-                romanNum += "IX"
-            }
-            nCopy - 5 >= 0 -> {
-                nCopy -= 5
-                romanNum += "V"
-            }
-            nCopy - 4 >= 0 -> {
-                nCopy -= 4
-                romanNum += "IV"
-            }
-            nCopy - 1 >= 0 -> {
-                nCopy -= 1
-                romanNum += "I"
-            }
+    var romanNumber = ""
+    val romanNumeralsList = listOf(
+        1000 to "M",
+        900 to "CM",
+        500 to "D",
+        400 to "CD",
+        100 to "C",
+        90 to "XC",
+        50 to "L",
+        40 to "XL",
+        10 to "X",
+        9 to "IX",
+        5 to "V",
+        4 to "IV",
+        1 to "I"
+    )
+    for ((first, second) in romanNumeralsList) {
+        while (nCopy - first >= 0) {
+            nCopy -= first
+            romanNumber += second
         }
-
     }
-    return romanNum
+    return romanNumber
 }
 
 /**
