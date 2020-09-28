@@ -97,16 +97,12 @@ fun buildWordSet(text: List<String>): MutableSet<String> {
  *     -> mapOf(5 to listOf("Семён", "Михаил"), 3 to listOf("Марат"))
  */
 fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
-    val arrayOfListGrades = arrayListOf<MutableList<String>>()
-    for (i in 0..3)
-        arrayOfListGrades.add(mutableListOf())
-    for ((student, grade) in grades) {
-        arrayOfListGrades[grade - 2].add(student)
-    }
     val resMap = mutableMapOf<Int, MutableList<String>>()
-    for (i in 0..3)
-        if (arrayOfListGrades[i].isNotEmpty())
-            resMap[i + 2] = arrayOfListGrades[i]
+    for ((student, grade) in grades) {
+        if (resMap[grade] == null)
+            resMap[grade] = mutableListOf()
+        resMap[grade]!!.add(student)
+    }
     return resMap
 }
 
@@ -121,12 +117,11 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "zee", "b" to "sweet")) -> false
  */
 fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
-    var res = true
     for ((key, value) in a) {
         if (b[key] != value)
-            res = false
+            return false
     }
-    return res
+    return true
 }
 
 /**
@@ -189,16 +184,15 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
  *     -> mapOf("MSFT" to 150.0, "NFLX" to 40.0)
  */
 fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Double> {
-    val setOfStocks = mutableSetOf<String>()
+    val dealsMap = mutableMapOf<String, MutableList<Double>>()
     val averageStockPriceMap = mutableMapOf<String, Double>()
-    for ((first) in stockPrices)
-        setOfStocks.add(first)
-    for (stock in setOfStocks) {
-        val listOfDeals = stockPrices.filter { it.first == stock }
-        val totalPurchaseAmount = listOfDeals.sumByDouble { (_, second) -> second }
-        val numberOfPurchases = listOfDeals.size
-        averageStockPriceMap[stock] = totalPurchaseAmount / numberOfPurchases
+    for ((first, second) in stockPrices) {
+        if (dealsMap[first] == null)
+            dealsMap[first] = mutableListOf()
+        dealsMap[first]!!.add(second)
     }
+    for ((key, value) in dealsMap)
+        averageStockPriceMap[key] = value.sum() / value.size
     return averageStockPriceMap
 }
 
@@ -218,16 +212,17 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
  *   ) -> "Мария"
  */
 fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): String? {
-    val listOfStuffOfChosenType = mutableListOf<Pair<String, Double>>()
-    for ((key, value) in stuff)
+    var min = Pair(Double.MAX_VALUE, "")
+    for ((key, value) in stuff) {
         if (value.first == kind)
-            listOfStuffOfChosenType.add(key to value.second)
-    var min = 0
-    for (i in 1 until listOfStuffOfChosenType.size)
-        if (listOfStuffOfChosenType[i].second < listOfStuffOfChosenType[min].second)
-            min = i
-    return if (listOfStuffOfChosenType.isEmpty()) null
-    else listOfStuffOfChosenType[min].first
+            if (value.second < min.first)
+                min = value.second to key
+    }
+    return if (min.second == "")
+        null
+    else min.second
+
+
 }
 
 /**
@@ -254,16 +249,16 @@ fun canBuildFrom(chars: List<Char>, word: String): Boolean = TODO()
  *   extractRepeats(listOf("a", "b", "a")) -> mapOf("a" to 2)
  */
 fun extractRepeats(list: List<String>): Map<String, Int> {
-    val setOfValues = list.toSet()
+    val numberOfRepeats = mutableMapOf<String, Int>()
     val resMap = mutableMapOf<String, Int>()
-    for (value in setOfValues) {
-        var repeats = 0
-        for (i in list) {
-            if (i == value)
-                repeats++
-        }
+    for (element in list) {
+        if (numberOfRepeats[element] == null)
+            numberOfRepeats[element] = 0
+        numberOfRepeats[element] = numberOfRepeats[element]!! + 1
+    }
+    for ((element, repeats) in numberOfRepeats) {
         if (repeats > 1)
-            resMap[value] = repeats
+            resMap[element] = repeats
     }
     return resMap
 }
