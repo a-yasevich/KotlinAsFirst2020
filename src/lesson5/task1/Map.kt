@@ -185,12 +185,9 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
  */
 fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Double> {
     val dealsMap = mutableMapOf<String, MutableList<Double>>()
+    for ((first, second) in stockPrices)
+        dealsMap.getOrPut(first) { mutableListOf() }.add(second)
     val averageStockPriceMap = mutableMapOf<String, Double>()
-    for ((first, second) in stockPrices) {
-        if (dealsMap[first] == null)
-            dealsMap[first] = mutableListOf()
-        dealsMap[first]!!.add(second)
-    }
     for ((key, value) in dealsMap)
         averageStockPriceMap[key] = value.sum() / value.size
     return averageStockPriceMap
@@ -212,17 +209,13 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
  *   ) -> "Мария"
  */
 fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): String? {
-    var min = Pair(Double.MAX_VALUE, "")
+    var min = Pair<Double, String?>(Double.MAX_VALUE, null)
     for ((key, value) in stuff) {
         if (value.first == kind)
             if (value.second < min.first)
                 min = value.second to key
     }
-    return if (min.second == "")
-        null
-    else min.second
-
-
+    return min.second
 }
 
 /**
@@ -249,18 +242,13 @@ fun canBuildFrom(chars: List<Char>, word: String): Boolean = TODO()
  *   extractRepeats(listOf("a", "b", "a")) -> mapOf("a" to 2)
  */
 fun extractRepeats(list: List<String>): Map<String, Int> {
-    val numberOfRepeats = mutableMapOf<String, Int>()
     val resMap = mutableMapOf<String, Int>()
     for (element in list) {
-        if (numberOfRepeats[element] == null)
-            numberOfRepeats[element] = 0
-        numberOfRepeats[element] = numberOfRepeats[element]!! + 1
+        if (resMap[element] == null)
+            resMap[element] = 0
+        resMap[element] = resMap[element]!! + 1
     }
-    for ((element, repeats) in numberOfRepeats) {
-        if (repeats > 1)
-            resMap[element] = repeats
-    }
-    return resMap
+    return resMap.filterValues { it > 1 }
 }
 
 /**
