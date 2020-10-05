@@ -2,6 +2,7 @@
 
 package lesson6.task1
 
+import java.lang.Exception
 import java.lang.NullPointerException
 import java.lang.NumberFormatException
 
@@ -167,7 +168,7 @@ fun firstDuplicateIndex(str: String): Int = TODO()
  */
 fun mostExpensive(description: String): String {
     val parts = description.split("; ")
-    var max = Pair("", 0.0)
+    var max = Pair("default", -1.0)
     try {
         for (part in parts) {
             val product = part.split(" ")
@@ -175,6 +176,7 @@ fun mostExpensive(description: String): String {
                 max = product.first() to product.last().toDouble()
         }
     } catch (e: NumberFormatException) {
+        println(description)
         return ""
     }
     return max.first
@@ -210,7 +212,7 @@ fun fromRoman(roman: String): Int {
                 res += romanNumeralsMap[roman[i]]!!
         }
         res += romanNumeralsMap.get(roman.last())!!
-    } catch (e: NullPointerException) {
+    } catch (e: Exception) {
         return -1
     }
     return res
