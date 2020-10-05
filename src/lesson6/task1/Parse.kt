@@ -2,10 +2,6 @@
 
 package lesson6.task1
 
-import java.lang.Exception
-import java.lang.NullPointerException
-import java.lang.NumberFormatException
-
 // Урок 6: разбор строк, исключения
 // Максимальное количество баллов = 13
 // Рекомендуемое количество баллов = 11
@@ -195,7 +191,7 @@ fun mostExpensive(description: String): String {
  */
 fun fromRoman(roman: String): Int {
     var res = 0
-    val romanNumeralsMap = mapOf<Char, Int>(
+    val romanNumeralsMap = mapOf(
         'M' to 1000,
         'D' to 500,
         'C' to 100,
@@ -207,11 +203,11 @@ fun fromRoman(roman: String): Int {
     try {
         for (i in 0 until roman.length - 1) {
             if (romanNumeralsMap[roman[i]]!! < romanNumeralsMap[roman[i + 1]]!!)
-                res -= romanNumeralsMap.get(roman[i])!!
+                res -= romanNumeralsMap[roman[i]]!!
             else
                 res += romanNumeralsMap[roman[i]]!!
         }
-        res += romanNumeralsMap.get(roman.last())!!
+        res += romanNumeralsMap[roman.last()]!!
     } catch (e: Exception) {
         return -1
     }
