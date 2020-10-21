@@ -521,10 +521,14 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         fileWriter.write(createIndent(currentIndent, ' ') + currentQuotient)
         fileWriter.newLine()
         currentRes = "-" + currentQuotient.toInt() / rhv * rhv
-        val indentForRes = createIndent(currentIndent + calculateIndent(currentQuotient, currentRes), ' ')
+        val indentForRes =
+            createIndent(currentIndent + calculateIndent(currentQuotient, currentRes), ' ')
         fileWriter.write(indentForRes + currentRes)
         fileWriter.newLine()
-        fileWriter.write(indentForRes + createIndent(currentRes.length, '-'))
+        fileWriter.write(
+            indentForRes
+                    + createIndent(Integer.max(currentRes.length, currentQuotient.length), '-')
+        )
         fileWriter.newLine()
         lastQuoitent = currentQuotient
         currentQuotient = (currentQuotient.toInt() + currentRes.toInt()).toString()
