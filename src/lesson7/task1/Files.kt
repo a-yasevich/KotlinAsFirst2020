@@ -305,14 +305,7 @@ Suspendisse ~~et elit in enim tempus iaculis~~.
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    val fileReader = File(inputName).bufferedReader()
-    val text = mutableListOf<String>()
-    for(line in fileReader.readLines()){
-        text.add(line)
-    }
-    //Функция, которая ставит скобки
-    //Функция, которая ставит абзацы
-    println(text)
+    TODO()
 }
 
 /**
