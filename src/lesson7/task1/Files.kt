@@ -63,7 +63,16 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
  * Подчёркивание в середине и/или в конце строк значения не имеет.
  */
 fun deleteMarked(inputName: String, outputName: String) {
-    TODO()
+    val fileWriter = File(outputName).bufferedWriter()
+    val fileReader = File(inputName).bufferedReader()
+    for (line in fileReader.readLines()) {
+        if (line.isEmpty() || line[0] != '_') {
+            fileWriter.write(line)
+            fileWriter.newLine()
+        }
+    }
+    fileWriter.close()
+    fileReader.close()
 }
 
 /**
@@ -75,7 +84,22 @@ fun deleteMarked(inputName: String, outputName: String) {
  * Регистр букв игнорировать, то есть буквы е и Е считать одинаковыми.
  *
  */
-fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> = TODO()
+fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
+    val text = File(inputName).bufferedReader().readLines().toString().toLowerCase()
+    val resMap = mutableMapOf<String, Int>()
+    for (string in substrings) {
+        //Схитрить не получилось
+        //resMap[string] = text.split(string.toLowerCase()).size - 1
+        //Тогда держите самое некрасивое решение
+        var k = 0
+        for (i in 0..text.length - string.length){
+            if (text.subSequence(i, i + string.length) == string.toLowerCase())
+                k++
+        }
+        resMap[string] = k
+    }
+    return resMap
+}
 
 
 /**
@@ -282,7 +306,14 @@ Suspendisse ~~et elit in enim tempus iaculis~~.
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    TODO()
+    val fileReader = File(inputName).bufferedReader()
+    val text = mutableListOf<String>()
+    for(line in fileReader.readLines()){
+        text.add(line)
+    }
+    //Функция, которая ставит скобки
+    //Функция, которая ставит абзацы
+    println(text)
 }
 
 /**
@@ -449,6 +480,51 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  *
  */
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
-    TODO()
+
+    fun createIndent(number: Int, c: Char): String {
+        var indent = ""
+        for (i in 0 until number)
+            indent += c
+        return indent
+    }
+
+    fun calculateIndent(number: String, numberToAlign: String) =
+        if (number.length > numberToAlign.length) number.length - numberToAlign.length
+        //else if(number.length == numberToAlign.length) 1 гавно идея
+        else 0
+    //Может подлкючить отрицательые числа? Может ровнения разные по сути?
+    val fileWriter = File(outputName).bufferedWriter()
+    var res = ""
+    var currentQuoitent = ""
+    var currentRes = 0
+    println(" " + lhv + " | " + rhv + " " + lhv / rhv)
+    res += " $lhv | $rhv\n"
+    for(numeral in lhv.toString()){
+        currentQuoitent += numeral
+        if(currentQuoitent.toInt()>=rhv) break
+    }
+    //currentIndent - штука, которая увеличивается если я поровнял число
+    val remainingLhv = lhv.toString().removeRange(0, currentQuoitent.toString().length)
+    currentRes = currentQuoitent.toInt() / rhv * rhv
+    res += createIndent(calculateIndent(currentQuoitent, currentRes.toString()), ' ') + '-' + currentRes + createIndent(lhv.toString().length+3 - currentRes.toString().length, ' ') +  lhv/rhv + '\n'
+    res += createIndent(currentRes.toString().length+1,'-') + '\n'
+    currentQuoitent = (currentQuoitent.toInt() - currentRes).toString()
+    var currentIndent = 1
+    for (numeral in remainingLhv){
+        currentIndent += calculateIndent(currentRes.toString(), currentQuoitent) //+1 потому что учитываю минус
+        currentQuoitent += numeral //Сношу новую цифру
+        res += createIndent(currentIndent, ' ') + currentQuoitent + '\n'//Использую посчитанный отступ
+        currentRes = currentQuoitent.toInt() / rhv * rhv
+        res += createIndent(currentIndent + calculateIndent(currentQuoitent, currentRes.toString()) - 1, ' ') + '-' + currentRes + '\n'
+        res += createIndent(currentIndent + calculateIndent(currentQuoitent, currentRes.toString()) - 1,' ') + createIndent(currentRes.toString().length+1,'-') + '\n'
+        currentQuoitent =  (currentQuoitent.toInt() - currentRes).toString()
+        println(currentIndent)
+    }
+    println(currentRes.toString() + " " +currentQuoitent)
+    currentIndent += calculateIndent(currentRes.toString(), currentQuoitent)
+    println(currentIndent)
+    res+=createIndent(currentIndent, ' ') + currentQuoitent
+    fileWriter.write(res)
+    fileWriter.close()
 }
 
