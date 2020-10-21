@@ -88,9 +88,8 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
     val text = File(inputName).bufferedReader().readLines().toString().toLowerCase()
     val resMap = mutableMapOf<String, Int>()
     for (string in substrings) {
-        //Схитрить не получилось
+        //Схитрить не получилось по понятным причинам
         //resMap[string] = text.split(string.toLowerCase()).size - 1
-        //Тогда держите самое некрасивое решение
         var k = 0
         for (i in 0..text.length - string.length){
             if (text.subSequence(i, i + string.length) == string.toLowerCase())
@@ -481,50 +480,57 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  */
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
 
-    fun createIndent(number: Int, c: Char): String {
+    fun createIndent(indentSize: Int, c: Char): String {
         var indent = ""
-        for (i in 0 until number)
+        for (i in 0 until indentSize)
             indent += c
         return indent
     }
 
     fun calculateIndent(number: String, numberToAlign: String) =
-        if (number.length > numberToAlign.length) number.length - numberToAlign.length
-        //else if(number.length == numberToAlign.length) 1 гавно идея
-        else 0
-    //Может подлкючить отрицательые числа? Может ровнения разные по сути?
+        number.length - numberToAlign.length
+
     val fileWriter = File(outputName).bufferedWriter()
-    var res = ""
-    var currentQuoitent = ""
-    var currentRes = 0
-    println(" " + lhv + " | " + rhv + " " + lhv / rhv)
-    res += " $lhv | $rhv\n"
-    for(numeral in lhv.toString()){
-        currentQuoitent += numeral
-        if(currentQuoitent.toInt()>=rhv) break
+
+    fileWriter.write(" $lhv | $rhv\n")
+
+    var currentQuotient = ""
+    var currentRes: String
+
+    for (numeral in lhv.toString()) {
+        currentQuotient += numeral
+        if (currentQuotient.toInt() >= rhv) break
     }
-    //currentIndent - штука, которая увеличивается если я поровнял число
-    val remainingLhv = lhv.toString().removeRange(0, currentQuoitent.toString().length)
-    currentRes = currentQuoitent.toInt() / rhv * rhv
-    res += createIndent(calculateIndent(currentQuoitent, currentRes.toString()), ' ') + '-' + currentRes + createIndent(lhv.toString().length+3 - currentRes.toString().length, ' ') +  lhv/rhv + '\n'
-    res += createIndent(currentRes.toString().length+1,'-') + '\n'
-    currentQuoitent = (currentQuoitent.toInt() - currentRes).toString()
-    var currentIndent = 1
-    for (numeral in remainingLhv){
-        currentIndent += calculateIndent(currentRes.toString(), currentQuoitent) //+1 потому что учитываю минус
-        currentQuoitent += numeral //Сношу новую цифру
-        res += createIndent(currentIndent, ' ') + currentQuoitent + '\n'//Использую посчитанный отступ
-        currentRes = currentQuoitent.toInt() / rhv * rhv
-        res += createIndent(currentIndent + calculateIndent(currentQuoitent, currentRes.toString()) - 1, ' ') + '-' + currentRes + '\n'
-        res += createIndent(currentIndent + calculateIndent(currentQuoitent, currentRes.toString()) - 1,' ') + createIndent(currentRes.toString().length+1,'-') + '\n'
-        currentQuoitent =  (currentQuoitent.toInt() - currentRes).toString()
-        println(currentIndent)
+
+    val remainingLhv = lhv.toString().removeRange(0, currentQuotient.length)
+    currentRes = "-" + currentQuotient.toInt() / rhv * rhv
+    fileWriter.write(
+        createIndent(calculateIndent(currentQuotient, currentRes), ' ') + currentRes
+                + createIndent(lhv.toString().length + 3 - (currentRes.length - 1), ' ')
+                + lhv / rhv
+    )
+    fileWriter.newLine()
+    fileWriter.write(createIndent(currentRes.length, '-'))
+    fileWriter.newLine()
+    var lastQuoitent = currentQuotient + ' '
+    currentQuotient = (currentQuotient.toInt() + currentRes.toInt()).toString()
+    var currentIndent = 0
+    for (numeral in remainingLhv) {
+        currentIndent += calculateIndent(lastQuoitent, currentQuotient)
+        currentQuotient += numeral
+        fileWriter.write(createIndent(currentIndent, ' ') + currentQuotient)
+        fileWriter.newLine()
+        currentRes = "-" + currentQuotient.toInt() / rhv * rhv
+        val indentForRes = createIndent(currentIndent + calculateIndent(currentQuotient, currentRes), ' ')
+        fileWriter.write(indentForRes + currentRes)
+        fileWriter.newLine()
+        fileWriter.write(indentForRes + createIndent(currentRes.length, '-'))
+        fileWriter.newLine()
+        lastQuoitent = currentQuotient
+        currentQuotient = (currentQuotient.toInt() + currentRes.toInt()).toString()
     }
-    println(currentRes.toString() + " " +currentQuoitent)
-    currentIndent += calculateIndent(currentRes.toString(), currentQuoitent)
-    println(currentIndent)
-    res+=createIndent(currentIndent, ' ') + currentQuoitent
-    fileWriter.write(res)
+    currentIndent += calculateIndent(lastQuoitent, currentQuotient)
+    fileWriter.write(createIndent(currentIndent, ' ') + currentQuotient)
     fileWriter.close()
 }
 
