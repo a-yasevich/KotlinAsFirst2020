@@ -3,6 +3,8 @@
 package lesson7.task1
 
 import java.io.File
+import kotlin.math.abs
+import kotlin.math.max
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -85,11 +87,9 @@ fun deleteMarked(inputName: String, outputName: String) {
  *
  */
 fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
-    val text = File(inputName).bufferedReader().readLines().toString().toLowerCase()
+    val text = File(inputName).bufferedReader().readText().toLowerCase()
     val resMap = mutableMapOf<String, Int>()
     for (string in substrings) {
-        //Схитрить не получилось по понятным причинам
-        //resMap[string] = text.split(string.toLowerCase()).size - 1
         var k = 0
         for (i in 0..text.length - string.length){
             if (text.subSequence(i, i + string.length) == string.toLowerCase())
@@ -473,13 +473,6 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  */
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
 
-    fun createIndent(indentSize: Int, c: Char): String {
-        var indent = ""
-        for (i in 0 until indentSize)
-            indent += c
-        return indent
-    }
-
     fun calculateIndent(number: String, numberToAlign: String) =
         number.length - numberToAlign.length
 
@@ -489,7 +482,6 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
 
     var currentQuotient = ""
     var currentRes: String
-
     for (numeral in lhv.toString()) {
         currentQuotient += numeral
         if (currentQuotient.toInt() >= rhv) break
@@ -498,12 +490,12 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     val remainingLhv = lhv.toString().removeRange(0, currentQuotient.length)
     currentRes = "-" + currentQuotient.toInt() / rhv * rhv
     fileWriter.write(
-        createIndent(calculateIndent(currentQuotient, currentRes), ' ') + currentRes
-                + createIndent(lhv.toString().length + 3 - (currentRes.length - 1), ' ')
+        currentRes
+                + " ".repeat(lhv.toString().length + 3 - (currentRes.length - 1))
                 + lhv / rhv
     )
     fileWriter.newLine()
-    fileWriter.write(createIndent(currentRes.length, '-'))
+    fileWriter.write("-".repeat(currentRes.length))
     fileWriter.newLine()
     var lastQuoitent = currentQuotient + ' '
     currentQuotient = (currentQuotient.toInt() + currentRes.toInt()).toString()
@@ -511,23 +503,24 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     for (numeral in remainingLhv) {
         currentIndent += calculateIndent(lastQuoitent, currentQuotient)
         currentQuotient += numeral
-        fileWriter.write(createIndent(currentIndent, ' ') + currentQuotient)
+        fileWriter.write(" ".repeat(currentIndent) + currentQuotient)
         fileWriter.newLine()
         currentRes = "-" + currentQuotient.toInt() / rhv * rhv
-        val indentForRes =
-            createIndent(currentIndent + calculateIndent(currentQuotient, currentRes), ' ')
-        fileWriter.write(indentForRes + currentRes)
-        fileWriter.newLine()
         fileWriter.write(
-            indentForRes
-                    + createIndent(Integer.max(currentRes.length, currentQuotient.length), '-')
+            " ".repeat(currentIndent + calculateIndent(currentQuotient, currentRes))
+                    + currentRes
         )
+        fileWriter.newLine()
+        if (currentQuotient.length >= currentRes.length)
+            fileWriter.write(" ".repeat(currentIndent) + "-".repeat(currentQuotient.length))
+        else
+            fileWriter.write(" ".repeat(currentIndent - 1) + "-".repeat(currentQuotient.length + 1))
         fileWriter.newLine()
         lastQuoitent = currentQuotient
         currentQuotient = (currentQuotient.toInt() + currentRes.toInt()).toString()
     }
     currentIndent += calculateIndent(lastQuoitent, currentQuotient)
-    fileWriter.write(createIndent(currentIndent, ' ') + currentQuotient)
+    fileWriter.write(" ".repeat(currentIndent) + currentQuotient)
     fileWriter.close()
 }
 
