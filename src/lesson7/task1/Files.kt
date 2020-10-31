@@ -3,8 +3,6 @@
 package lesson7.task1
 
 import java.io.File
-import kotlin.math.abs
-import kotlin.math.max
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -91,9 +89,10 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
     val resMap = mutableMapOf<String, Int>()
     for (string in substrings) {
         var k = 0
-        for (i in 0..text.length - string.length){
-            if (text.subSequence(i, i + string.length) == string.toLowerCase())
-                k++
+        var index = 0
+        while (text.indexOf(string.toLowerCase(), index) != -1){
+            index = text.indexOf(string.toLowerCase(), index) + 1
+            k++
         }
         resMap[string] = k
     }
@@ -305,7 +304,44 @@ Suspendisse ~~et elit in enim tempus iaculis~~.
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    TODO()
+    fun makeReplacements(line: String, toReplace: String, replaceOpening: String, replaceClosing: String): String {
+        var index = line.indexOf(toReplace)
+        var res = line
+        res = res.replaceRange(index until index + toReplace.length, replaceOpening)
+        index = res.indexOf(toReplace)
+        res = res.replaceRange(index until index + toReplace.length, replaceClosing)
+        return res
+    }
+
+    fun convertLine(line: String): String {
+        var res = line
+        while (res.indexOf("**") != -1)
+            res = makeReplacements(res, "**", "<b>", "</b>")
+        while (res.indexOf("*") != -1)
+            res = makeReplacements(res, "*", "<i>", "</i>")
+        while (res.indexOf("~~") != -1)
+            res = makeReplacements(res, "~~", "<s>", "</s>")
+        return res
+    }
+
+    val fileReader = File(inputName).bufferedReader()
+    val fileWriter = File(outputName).bufferedWriter()
+
+    fileWriter.write("<html>\n")
+    fileWriter.write("\t<body>\n")
+    fileWriter.write("\t\t<p>\n")
+    for (line in fileReader.lines()) {
+        if (line.isEmpty()) {
+            fileWriter.write("\t\t</p>\n")
+            fileWriter.write("\t\t<p>\n")
+        } else
+            fileWriter.write("\t\t\t" + convertLine(line) + "\n")
+    }
+    fileWriter.write("\t\t</p>\n")
+    fileWriter.write("\t</body>\n")
+    fileWriter.write("</html>\n")
+    fileReader.close()
+    fileWriter.close()
 }
 
 /**

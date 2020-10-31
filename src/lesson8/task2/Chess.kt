@@ -2,6 +2,8 @@
 
 package lesson8.task2
 
+import java.lang.IllegalArgumentException
+
 /**
  * Клетка шахматной доски. Шахматная доска квадратная и имеет 8 х 8 клеток.
  * Поэтому, обе координаты клетки (горизонталь row, вертикаль column) могут находиться в пределах от 1 до 8.
@@ -32,7 +34,12 @@ data class Square(val column: Int, val row: Int) {
  * В нотации, колонки обозначаются латинскими буквами от a до h, а ряды -- цифрами от 1 до 8.
  * Если нотация некорректна, бросить IllegalArgumentException
  */
-fun square(notation: String): Square = TODO()
+fun square(notation: String): Square {
+    val aCode = 'a'.toInt()
+    if (notation.length != 2 || notation[0].toInt() !in aCode..aCode + 7 || notation[1].toString().toInt() !in 1..8)
+        throw IllegalArgumentException("Incorrect notation")
+    else return Square(notation[0].toInt() - aCode + 1, notation[1].toString().toInt())
+}
 
 /**
  * Простая (2 балла)
@@ -181,7 +188,39 @@ fun kingTrajectory(start: Square, end: Square): List<Square> = TODO()
  * Пример: knightMoveNumber(Square(3, 1), Square(6, 3)) = 3.
  * Конь может последовательно пройти через клетки (5, 2) и (4, 4) к клетке (6, 3).
  */
-fun knightMoveNumber(start: Square, end: Square): Int = TODO()
+fun knightMoveNumber(start: Square, end: Square): Int {
+
+    val possibleXYChanges = listOf(-2 to -1, -1 to -2, 1 to -2, 2 to -1, -2 to 1, -1 to 2, 1 to 2, 2 to 1)
+    val queue = mutableListOf<Pair<Square, Int>>()
+
+    queue.add(Pair(start, 0))
+
+    val squareVisitMap = mutableMapOf<Square, Boolean>()
+
+    for (x in 1..8)
+        for (y in 1..8)
+            squareVisitMap[Square(x, y)] = false
+
+    squareVisitMap[start] = true
+
+    while (queue.isNotEmpty()) {
+
+        val currentSquare = queue[0]
+        queue.removeAt(0)
+
+        if (currentSquare.first.row == end.row && currentSquare.first.column == end.column) return currentSquare.second
+
+        for ((first, second) in possibleXYChanges) {
+            val squareNew = Square(currentSquare.first.column + first, currentSquare.first.row + second)
+            if (squareNew.inside() && !squareVisitMap[squareNew]!!) {
+                squareVisitMap[squareNew] = true
+                queue.add(Pair(squareNew, currentSquare.second + 1))
+            }
+        }
+
+    }
+    return -1
+}
 
 /**
  * Очень сложная (10 баллов)
