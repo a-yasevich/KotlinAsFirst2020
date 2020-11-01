@@ -3,7 +3,6 @@
 package lesson8.task1
 
 import lesson1.task1.sqr
-import lesson2.task1.segmentLength
 import kotlin.math.*
 
 // Урок 8: простые классы
@@ -80,8 +79,12 @@ data class Circle(val center: Point, val radius: Double) {
      * расстояние между их центрами минус сумма их радиусов.
      * Расстояние между пересекающимися окружностями считать равным 0.0.
      */
-    fun distance(other: Circle): Double =
-        sqrt((center.x - other.center.x).pow(2) + (center.y - other.center.y).pow(2)) - (radius + other.radius)
+    fun distance(other: Circle): Double {
+        val centerDistance = sqrt((center.x - other.center.x).pow(2) + (center.y - other.center.y).pow(2))
+        val radiusSum = radius + other.radius
+        return if (centerDistance < radiusSum) 0.0
+        else centerDistance - radiusSum
+    }
 
     /**
      * Тривиальная (1 балл)
@@ -122,7 +125,7 @@ fun diameter(vararg points: Point): Segment = TODO()
  */
 fun circleByDiameter(diameter: Segment): Circle = Circle(
     Point((diameter.begin.x + diameter.end.x) / 2, (diameter.begin.y + diameter.end.y) / 2),
-    diameter.length/2
+    diameter.length / 2
 )
 
 /**
@@ -167,14 +170,18 @@ class Line private constructor(val b: Double, val angle: Double) {
  * (y - point.y) * cos(angle) = (x - point.x) * sin(angle)
  * (y - point.y)/(x - point.x) = tg(angle)
  */
-fun lineBySegment(s: Segment): Line = Line(s.begin, atan2(abs(s.begin.y - s.end.y), s.end.x - s.begin.x))
+fun Double.convertAngle() =
+    if (this == PI) 0.0
+    else this
+
+fun lineBySegment(s: Segment): Line = Line(s.begin, atan2(abs(s.begin.y - s.end.y), s.end.x - s.begin.x).convertAngle())
 
 /**
  * Средняя (3 балла)
  *
  * Построить прямую по двум точкам
  */
-fun lineByPoints(a: Point, b: Point): Line = Line(a, atan2(abs(a.y - b.y), b.x - a.x))
+fun lineByPoints(a: Point, b: Point): Line = Line(a, abs(PI - atan2(abs(a.y - b.y), a.x - b.x)).convertAngle())
 
 /**
  * Сложная (5 баллов)

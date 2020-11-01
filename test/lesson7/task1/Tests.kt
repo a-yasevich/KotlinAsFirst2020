@@ -438,7 +438,7 @@ Basic, Ruby, Swift.
                   0
              """
         )
-
+        test(43309, 84999, "43309 | 84999\n   -0   0\n-----\n43309")
         File("temp.txt").delete()
     }
 }

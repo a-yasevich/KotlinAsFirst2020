@@ -16,7 +16,10 @@ data class Square(val column: Int, val row: Int) {
      * Возвращает true, если клетка находится в пределах доски
      */
     fun inside(): Boolean = column in 1..8 && row in 1..8
-
+    fun check(){
+        if (column !in 1..8 || row !in 1..8)
+            throw IllegalArgumentException()
+    }
     /**
      * Простая (2 балла)
      *
@@ -190,17 +193,17 @@ fun kingTrajectory(start: Square, end: Square): List<Square> = TODO()
  */
 fun knightMoveNumber(start: Square, end: Square): Int {
 
+    start.check()
+    end.check()
+
     val possibleXYChanges = listOf(-2 to -1, -1 to -2, 1 to -2, 2 to -1, -2 to 1, -1 to 2, 1 to 2, 2 to 1)
     val queue = mutableListOf<Pair<Square, Int>>()
-
     queue.add(Pair(start, 0))
 
     val squareVisitMap = mutableMapOf<Square, Boolean>()
-
     for (x in 1..8)
         for (y in 1..8)
             squareVisitMap[Square(x, y)] = false
-
     squareVisitMap[start] = true
 
     while (queue.isNotEmpty()) {

@@ -3,6 +3,7 @@
 package lesson7.task1
 
 import java.io.File
+import kotlin.math.max
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -313,8 +314,8 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
         return res
     }
 
-    fun convertLine(line: String): String {
-        var res = line
+    fun convertText(text: String): String {
+        var res = text
         while (res.indexOf("**") != -1)
             res = makeReplacements(res, "**", "<b>", "</b>")
         while (res.indexOf("*") != -1)
@@ -326,16 +327,19 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
 
     val fileReader = File(inputName).bufferedReader()
     val fileWriter = File(outputName).bufferedWriter()
-
+    val text = fileReader.buffered().readText()
+    val textList = convertText(text).lineSequence().toList().toMutableList()
+    textList.removeLast()
     fileWriter.write("<html>\n")
     fileWriter.write("\t<body>\n")
     fileWriter.write("\t\t<p>\n")
-    for (line in fileReader.lines()) {
+    for (line in textList) {
         if (line.isEmpty()) {
             fileWriter.write("\t\t</p>\n")
             fileWriter.write("\t\t<p>\n")
-        } else
-            fileWriter.write("\t\t\t" + convertLine(line) + "\n")
+        }
+        else
+            fileWriter.write(line)
     }
     fileWriter.write("\t\t</p>\n")
     fileWriter.write("\t</body>\n")
@@ -512,32 +516,41 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     fun calculateIndent(number: String, numberToAlign: String) =
         number.length - numberToAlign.length
 
-    val fileWriter = File(outputName).bufferedWriter()
-
-    fileWriter.write(" $lhv | $rhv\n")
-
     var currentQuotient = ""
-    var currentRes: String
     for (numeral in lhv.toString()) {
         currentQuotient += numeral
         if (currentQuotient.toInt() >= rhv) break
+
     }
 
+
     val remainingLhv = lhv.toString().removeRange(0, currentQuotient.length)
+    var currentRes: String
     currentRes = "-" + currentQuotient.toInt() / rhv * rhv
+
+    val spaceCrutch =
+        if (currentRes.length - 1 < currentQuotient.length) ""
+        else " "
+    val indentForTheFirstResult = calculateIndent(spaceCrutch + currentQuotient, currentRes)
+
+    val fileWriter = File(outputName).bufferedWriter()
+    fileWriter.write("$spaceCrutch$lhv | $rhv\n")
     fileWriter.write(
-        currentRes
-                + " ".repeat(lhv.toString().length + 3 - (currentRes.length - 1))
-                + lhv / rhv
+        " ".repeat(indentForTheFirstResult) + currentRes + " ".repeat(
+            (spaceCrutch + currentQuotient + remainingLhv).length - (currentRes + " ".repeat(
+                indentForTheFirstResult
+            )).length + 3
+        ) + lhv / rhv
     )
     fileWriter.newLine()
-    fileWriter.write("-".repeat(currentRes.length))
+    fileWriter.write("-".repeat(max(currentRes.length, currentQuotient.length)))
     fileWriter.newLine()
-    var lastQuoitent = currentQuotient + ' '
+
+    var lastQuotient = currentQuotient + spaceCrutch
     currentQuotient = (currentQuotient.toInt() + currentRes.toInt()).toString()
     var currentIndent = 0
     for (numeral in remainingLhv) {
-        currentIndent += calculateIndent(lastQuoitent, currentQuotient)
+        currentIndent += calculateIndent(lastQuotient, currentQuotient)
         currentQuotient += numeral
         fileWriter.write(" ".repeat(currentIndent) + currentQuotient)
         fileWriter.newLine()
@@ -552,10 +565,10 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         else
             fileWriter.write(" ".repeat(currentIndent - 1) + "-".repeat(currentQuotient.length + 1))
         fileWriter.newLine()
-        lastQuoitent = currentQuotient
+        lastQuotient = currentQuotient
         currentQuotient = (currentQuotient.toInt() + currentRes.toInt()).toString()
     }
-    currentIndent += calculateIndent(lastQuoitent, currentQuotient)
+    currentIndent += calculateIndent(lastQuotient, currentQuotient)
     fileWriter.write(" ".repeat(currentIndent) + currentQuotient)
     fileWriter.close()
 }
