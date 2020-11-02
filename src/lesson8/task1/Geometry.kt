@@ -170,19 +170,15 @@ class Line private constructor(val b: Double, val angle: Double) {
  * (y - point.y) * cos(angle) = (x - point.x) * sin(angle)
  * (y - point.y)/(x - point.x) = tg(angle)
  */
-fun Double.convertAngle() =
-    if (this == PI) 0.0
-    else this
 
-fun lineBySegment(s: Segment): Line = Line(s.begin, atan2(abs(s.begin.y - s.end.y), s.end.x - s.begin.x).convertAngle())
+fun lineBySegment(s: Segment): Line = lineByPoints(s.begin, s.end)
 
 /**
  * Средняя (3 балла)
  *
  * Построить прямую по двум точкам
  */
-fun lineByPoints(a: Point, b: Point): Line = Line(a, abs(PI - atan2(abs(a.y - b.y), a.x - b.x)).convertAngle())
-
+fun lineByPoints(a: Point, b: Point): Line = Line(a, atan2(abs(a.y - b.y), abs(a.x - b.x)) % PI)
 /**
  * Сложная (5 баллов)
  *

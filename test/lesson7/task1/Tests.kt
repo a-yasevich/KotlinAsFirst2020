@@ -249,7 +249,6 @@ Basic, Ruby, Swift.
                     </html>
                     """.trimIndent().replace(Regex("[\\s\\n\\t]"), "")
         assertEquals(expected, result)
-
         File("temp.html").delete()
     }
 

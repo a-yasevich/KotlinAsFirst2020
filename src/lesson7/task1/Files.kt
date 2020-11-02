@@ -90,10 +90,11 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
     val resMap = mutableMapOf<String, Int>()
     for (string in substrings) {
         var k = 0
-        var index = 0
-        while (text.indexOf(string.toLowerCase(), index) != -1){
-            index = text.indexOf(string.toLowerCase(), index) + 1
+        var index = text.indexOf(string.toLowerCase())
+        while (index != -1){
+            index++
             k++
+            index = text.indexOf(string.toLowerCase(), index)
         }
         resMap[string] = k
     }
@@ -316,33 +317,40 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
 
     fun convertText(text: String): String {
         var res = text
-        while (res.indexOf("**") != -1)
+        var index = res.indexOf("**")
+        while (index != -1) {
             res = makeReplacements(res, "**", "<b>", "</b>")
-        while (res.indexOf("*") != -1)
+            index = res.indexOf("**", index)
+        }
+        index = res.indexOf("*")
+        while (index != -1) {
             res = makeReplacements(res, "*", "<i>", "</i>")
-        while (res.indexOf("~~") != -1)
+            index = res.indexOf("*", index)
+        }
+        index = res.indexOf("~~")
+        while (index != -1) {
             res = makeReplacements(res, "~~", "<s>", "</s>")
+            index = res.indexOf("~~", index)
+        }
         return res
     }
 
     val fileReader = File(inputName).bufferedReader()
     val fileWriter = File(outputName).bufferedWriter()
     val text = fileReader.buffered().readText()
-    val textList = convertText(text).lineSequence().toList().toMutableList()
-    textList.removeLast()
+    val textList = convertText(text).lineSequence().toList().dropLast(1)
     fileWriter.write("<html>\n")
-    fileWriter.write("\t<body>\n")
-    fileWriter.write("\t\t<p>\n")
+    fileWriter.write("<body>\n")
+    fileWriter.write("<p>\n")
     for (line in textList) {
         if (line.isEmpty()) {
-            fileWriter.write("\t\t</p>\n")
-            fileWriter.write("\t\t<p>\n")
-        }
-        else
+            fileWriter.write("</p>\n")
+            fileWriter.write("<p>\n")
+        } else
             fileWriter.write(line)
     }
-    fileWriter.write("\t\t</p>\n")
-    fileWriter.write("\t</body>\n")
+    fileWriter.write("</p>\n")
+    fileWriter.write("</body>\n")
     fileWriter.write("</html>\n")
     fileReader.close()
     fileWriter.close()
@@ -523,25 +531,23 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
 
     }
 
-
     val remainingLhv = lhv.toString().removeRange(0, currentQuotient.length)
-    var currentRes: String
-    currentRes = "-" + currentQuotient.toInt() / rhv * rhv
-
+    var currentRes = "-" + currentQuotient.toInt() / rhv * rhv
     val spaceCrutch =
         if (currentRes.length - 1 < currentQuotient.length) ""
         else " "
-    val indentForTheFirstResult = calculateIndent(spaceCrutch + currentQuotient, currentRes)
+
+    val indentForTheFirstResult = " ".repeat(
+        calculateIndent(spaceCrutch + currentQuotient, currentRes)
+    )
+    val lhvLength = (spaceCrutch + lhv.toString()).length
+    val indentForTheResOfDivision = " ".repeat(
+        lhvLength - (indentForTheFirstResult + currentRes).length + 3
+    )
 
     val fileWriter = File(outputName).bufferedWriter()
     fileWriter.write("$spaceCrutch$lhv | $rhv\n")
-    fileWriter.write(
-        " ".repeat(indentForTheFirstResult) + currentRes + " ".repeat(
-            (spaceCrutch + currentQuotient + remainingLhv).length - (currentRes + " ".repeat(
-                indentForTheFirstResult
-            )).length + 3
-        ) + lhv / rhv
-    )
+    fileWriter.write(indentForTheFirstResult + currentRes + indentForTheResOfDivision + lhv / rhv)
     fileWriter.newLine()
     fileWriter.write("-".repeat(max(currentRes.length, currentQuotient.length)))
     fileWriter.newLine()
@@ -549,6 +555,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     var lastQuotient = currentQuotient + spaceCrutch
     currentQuotient = (currentQuotient.toInt() + currentRes.toInt()).toString()
     var currentIndent = 0
+
     for (numeral in remainingLhv) {
         currentIndent += calculateIndent(lastQuotient, currentQuotient)
         currentQuotient += numeral
@@ -568,6 +575,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         lastQuotient = currentQuotient
         currentQuotient = (currentQuotient.toInt() + currentRes.toInt()).toString()
     }
+
     currentIndent += calculateIndent(lastQuotient, currentQuotient)
     fileWriter.write(" ".repeat(currentIndent) + currentQuotient)
     fileWriter.close()

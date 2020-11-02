@@ -16,10 +16,7 @@ data class Square(val column: Int, val row: Int) {
      * Возвращает true, если клетка находится в пределах доски
      */
     fun inside(): Boolean = column in 1..8 && row in 1..8
-    fun check(){
-        if (column !in 1..8 || row !in 1..8)
-            throw IllegalArgumentException()
-    }
+
     /**
      * Простая (2 балла)
      *
@@ -38,10 +35,12 @@ data class Square(val column: Int, val row: Int) {
  * Если нотация некорректна, бросить IllegalArgumentException
  */
 fun square(notation: String): Square {
-    val aCode = 'a'.toInt()
-    if (notation.length != 2 || notation[0].toInt() !in aCode..aCode + 7 || notation[1].toString().toInt() !in 1..8)
+    if (notation.length != 2)
         throw IllegalArgumentException("Incorrect notation")
-    else return Square(notation[0].toInt() - aCode + 1, notation[1].toString().toInt())
+    val square = Square(notation[0] - 'a' + 1, notation[1].toString().toInt())
+    if (!square.inside())
+        throw IllegalArgumentException("Incorrect notation")
+    return square
 }
 
 /**
@@ -192,32 +191,26 @@ fun kingTrajectory(start: Square, end: Square): List<Square> = TODO()
  * Конь может последовательно пройти через клетки (5, 2) и (4, 4) к клетке (6, 3).
  */
 fun knightMoveNumber(start: Square, end: Square): Int {
-
-    start.check()
-    end.check()
+    if (!start.inside() || !end.inside())
+        throw IllegalArgumentException("Incorrect start or end square")
 
     val possibleXYChanges = listOf(-2 to -1, -1 to -2, 1 to -2, 2 to -1, -2 to 1, -1 to 2, 1 to 2, 2 to 1)
-    val queue = mutableListOf<Pair<Square, Int>>()
-    queue.add(Pair(start, 0))
+    val queue = ArrayDeque<Pair<Square, Int>>()
+    val visitedSquares = mutableSetOf<Square>()
 
-    val squareVisitMap = mutableMapOf<Square, Boolean>()
-    for (x in 1..8)
-        for (y in 1..8)
-            squareVisitMap[Square(x, y)] = false
-    squareVisitMap[start] = true
+    queue.add(Pair(start, 0))
+    visitedSquares.add(start)
 
     while (queue.isNotEmpty()) {
+        val (currentSquare, currentLength) = queue.removeFirst()
+        if (currentSquare == end)
+            return currentLength
 
-        val currentSquare = queue[0]
-        queue.removeAt(0)
-
-        if (currentSquare.first.row == end.row && currentSquare.first.column == end.column) return currentSquare.second
-
-        for ((first, second) in possibleXYChanges) {
-            val squareNew = Square(currentSquare.first.column + first, currentSquare.first.row + second)
-            if (squareNew.inside() && !squareVisitMap[squareNew]!!) {
-                squareVisitMap[squareNew] = true
-                queue.add(Pair(squareNew, currentSquare.second + 1))
+        for ((changeX, changeY) in possibleXYChanges) {
+            val squareNew = Square(currentSquare.column + changeX, currentSquare.row + changeY)
+            if (squareNew.inside() && squareNew !in visitedSquares) {
+                visitedSquares.add(squareNew)
+                queue.add(Pair(squareNew, currentLength + 1))
             }
         }
 
