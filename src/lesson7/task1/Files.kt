@@ -89,13 +89,12 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
     val text = File(inputName).bufferedReader().readText().toLowerCase()
     val resMap = mutableMapOf<String, Int>()
     for (string in substrings) {
-        var k = 0
-        var index = text.indexOf(string.toLowerCase())
-        while (index != -1){
-            index++
+        var k = -1
+        var index = -1
+        do {
+            index = text.indexOf(string.toLowerCase(), index + 1)
             k++
-            index = text.indexOf(string.toLowerCase(), index)
-        }
+        } while (index != -1)
         resMap[string] = k
     }
     return resMap
@@ -307,38 +306,39 @@ Suspendisse ~~et elit in enim tempus iaculis~~.
  */
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
     fun makeReplacements(line: String, toReplace: String, replaceOpening: String, replaceClosing: String): String {
-        var index = line.indexOf(toReplace)
-        var res = line
-        res = res.replaceRange(index until index + toReplace.length, replaceOpening)
-        index = res.indexOf(toReplace)
-        res = res.replaceRange(index until index + toReplace.length, replaceClosing)
+        var res = ""
+        var indexOpening: Int
+        var indexClosing = -toReplace.length
+        while (line.indexOf(toReplace, indexClosing + toReplace.length) != -1) {
+            indexOpening = line.indexOf(toReplace, indexClosing + toReplace.length)
+            res += line.subSequence(indexClosing + toReplace.length until indexOpening)
+            res += replaceOpening
+            indexClosing = line.indexOf(toReplace, indexOpening + toReplace.length)
+            res += line.subSequence(indexOpening + toReplace.length until indexClosing)
+            res += replaceClosing
+        }
+        val remainingLine = line.subSequence(indexClosing + toReplace.length..line.lastIndex)
+        res += remainingLine
         return res
     }
 
     fun convertText(text: String): String {
         var res = text
-        var index = res.indexOf("**")
-        while (index != -1) {
-            res = makeReplacements(res, "**", "<b>", "</b>")
-            index = res.indexOf("**", index)
-        }
-        index = res.indexOf("*")
-        while (index != -1) {
-            res = makeReplacements(res, "*", "<i>", "</i>")
-            index = res.indexOf("*", index)
-        }
-        index = res.indexOf("~~")
-        while (index != -1) {
-            res = makeReplacements(res, "~~", "<s>", "</s>")
-            index = res.indexOf("~~", index)
-        }
+        val list = listOf(
+            Triple("**", "<b>", "</b>"),
+            Triple("*", "<i>", "</i>"),
+            Triple("~~", "<s>", "</s>")
+        )
+        for ((toReplace, replaceOpening, replaceClosing) in list)
+            res = makeReplacements(res, toReplace, replaceOpening, replaceClosing)
         return res
     }
 
     val fileReader = File(inputName).bufferedReader()
     val fileWriter = File(outputName).bufferedWriter()
     val text = fileReader.buffered().readText()
-    val textList = convertText(text).lineSequence().toList().dropLast(1)
+    val textList = convertText(text).lines().dropLastWhile { it == "" }
+
     fileWriter.write("<html>\n")
     fileWriter.write("<body>\n")
     fileWriter.write("<p>\n")
