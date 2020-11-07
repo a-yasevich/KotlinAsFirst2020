@@ -360,11 +360,11 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     }
 
     val fileWriter = File(outputName).bufferedWriter()
-    fileWriter.write("<html>\n")
-    fileWriter.write("<body>\n")
-
+    fileWriter.write("<html>")
+    fileWriter.write("<body>")
+    fileWriter.write("<p>")
     val text = File(inputName).bufferedReader().readText().makeReplacements()
-    var isOpen = false
+    var isOpen = true
     for (line in text.lines()) {
         if (line.trim().isNotEmpty() && !isOpen) {
             isOpen = true
@@ -378,9 +378,9 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
             fileWriter.write(line)
     }
     if (isOpen)
-        fileWriter.write("</p>\n")
-    fileWriter.write("</body>\n")
-    fileWriter.write("</html>\n")
+        fileWriter.write("</p>")
+    fileWriter.write("</body>")
+    fileWriter.write("</html>")
     fileWriter.close()
 }
 
