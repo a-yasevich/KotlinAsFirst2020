@@ -3,6 +3,8 @@
 package lesson7.task1
 
 import java.io.File
+import java.lang.StringBuilder
+import java.util.*
 import kotlin.math.max
 
 // Урок 7: работа с файлами
@@ -305,54 +307,80 @@ Suspendisse ~~et elit in enim tempus iaculis~~.
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    fun makeReplacements(line: String, toReplace: String, replaceOpening: String, replaceClosing: String): String {
-        var res = ""
-        var indexOpening: Int
-        var indexClosing = -toReplace.length
-        while (line.indexOf(toReplace, indexClosing + toReplace.length) != -1) {
-            indexOpening = line.indexOf(toReplace, indexClosing + toReplace.length)
-            res += line.subSequence(indexClosing + toReplace.length until indexOpening)
-            res += replaceOpening
-            indexClosing = line.indexOf(toReplace, indexOpening + toReplace.length)
-            res += line.subSequence(indexOpening + toReplace.length until indexClosing)
-            res += replaceClosing
+
+    fun Map<String, Int>.findMinPairInMap(): Pair<String, Int> {
+        var minPair = "" to Int.MAX_VALUE
+        for ((key, value) in this) {
+            if (value < minPair.second && value != -1)
+                minPair = key to value
         }
-        val remainingLine = line.subSequence(indexClosing + toReplace.length..line.lastIndex)
-        res += remainingLine
-        return res
+        return minPair
     }
 
-    fun convertText(text: String): String {
-        var res = text
-        val list = listOf(
-            Triple("**", "<b>", "</b>"),
-            Triple("*", "<i>", "</i>"),
-            Triple("~~", "<s>", "</s>")
+    fun String.makeReplacements(): String {
+
+        val markerIndicesMap = mutableMapOf(
+            "**" to this.indexOf("**"),
+            "*" to this.indexOf("*"),
+            "~~" to this.indexOf("~~")
         )
-        for ((toReplace, replaceOpening, replaceClosing) in list)
-            res = makeReplacements(res, toReplace, replaceOpening, replaceClosing)
-        return res
+        var startIndex: Int
+
+        val infoAboutEachMarkerMap = mutableMapOf<Int, Pair<String, Int>>()
+        val stack = Stack<Pair<String, Int>>()
+        stack.push("filler" to 0)
+
+        while (markerIndicesMap.any { it.value != -1 }) {
+            val (marker, index) = markerIndicesMap.findMinPairInMap()
+            startIndex = index + marker.length
+            for (key in markerIndicesMap.keys)
+                markerIndicesMap[key] = this.indexOf(key, startIndex)
+            if (marker == stack.peek().first) {
+                val poppedMarker = stack.pop()
+                infoAboutEachMarkerMap[poppedMarker.second] = poppedMarker.first to 0
+                infoAboutEachMarkerMap[index] = marker to 1
+            } else stack.push(marker to index)
+        }
+
+        val interpreter = mapOf(
+            "**" to listOf("<b>", "</b>"),
+            "*" to listOf("<i>", "</i>"),
+            "~~" to listOf("<s>", "</s>")
+        )
+        val resBuilder = StringBuilder()
+        startIndex = 0
+        for ((index, infoPair) in infoAboutEachMarkerMap.toSortedMap()) {
+            val (marker, markerType) = infoPair
+            resBuilder.append(this.substring(startIndex until index))
+            resBuilder.append(interpreter[marker]?.get(markerType))
+            startIndex = index + marker.length
+        }
+        resBuilder.append(substring(startIndex until this.length))
+        return resBuilder.toString()
     }
 
-    val fileReader = File(inputName).bufferedReader()
     val fileWriter = File(outputName).bufferedWriter()
-    val text = fileReader.buffered().readText()
-    val textList = convertText(text).lines().dropLastWhile { it == "" }
-
     fileWriter.write("<html>\n")
     fileWriter.write("<body>\n")
-    fileWriter.write("<p>\n")
-    for (line in textList) {
-        if (line.isEmpty()) {
-            fileWriter.write("</p>\n")
-            fileWriter.write("<p>\n")
-        } else
+
+    val text = File(inputName).bufferedReader().readText().makeReplacements()
+    var isOpen = false
+    for (line in text.lines()) {
+        if (line.isNotEmpty() && !isOpen) {
+            isOpen = true
+            fileWriter.write("<p>")
+        }
+        if (line.isEmpty() && isOpen) {
+            isOpen = false
+            fileWriter.write("</p>")
+        }
+        if (isOpen)
             fileWriter.write(line)
     }
-    fileWriter.write("</p>\n")
+    if (isOpen)
+        fileWriter.write("</p>\n")
     fileWriter.write("</body>\n")
     fileWriter.write("</html>\n")
-    fileReader.close()
     fileWriter.close()
 }
 
