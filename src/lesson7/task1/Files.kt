@@ -328,7 +328,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
 
         val infoAboutEachMarkerMap = mutableMapOf<Int, Pair<String, Int>>()
         val stack = Stack<Pair<String, Int>>()
-        stack.push("filler" to 0)
+        stack.push("cat toilet filler, kg" to 3)
 
         while (markerIndicesMap.any { it.value != -1 }) {
             val (marker, index) = markerIndicesMap.findMinPairInMap()
@@ -362,9 +362,8 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     val fileWriter = File(outputName).bufferedWriter()
     fileWriter.write("<html>")
     fileWriter.write("<body>")
-    fileWriter.write("<p>")
     val text = File(inputName).bufferedReader().readText().makeReplacements()
-    var isOpen = true
+    var isOpen = false
     for (line in text.lines()) {
         if (line.trim().isNotEmpty() && !isOpen) {
             isOpen = true
@@ -379,6 +378,8 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     }
     if (isOpen)
         fileWriter.write("</p>")
+    if (text.isEmpty())
+        fileWriter.write("<p></p>")
     fileWriter.write("</body>")
     fileWriter.write("</html>")
     fileWriter.close()
