@@ -325,7 +325,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
 
             for (key in markerIndicesMap.keys)
                 markerIndicesMap[key] = this.indexOf(key, startIndex)
-            if (marker == markersDeque.firstOrNull()?.first ?: "filler") {
+            if (marker == markersDeque.firstOrNull()?.first) {
                 val poppedMarker = markersDeque.pop()
                 infoAboutEachMarkerMap[poppedMarker.second] = poppedMarker.first to 0
                 infoAboutEachMarkerMap[index] = marker to 1
