@@ -318,22 +318,19 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
 
         val infoAboutEachMarkerMap = mutableMapOf<Int, Pair<String, Int>>()
         val markersDeque = ArrayDeque<Pair<String, Int>>()
-        markersDeque.push("filler" to 0)
 
         while (markerIndicesMap.any { it.value != -1 }) {
-            val (marker, index) = markerIndicesMap.filter { it.value != -1 }
-                .minByOrNull { it.value }!!.toPair()
+            val (marker, index) = markerIndicesMap.filter { it.value != -1 }.minByOrNull{ it.value }!!
             startIndex = index + marker.length
 
             for (key in markerIndicesMap.keys)
                 markerIndicesMap[key] = this.indexOf(key, startIndex)
-            if (marker == markersDeque.peek().first) {
+            if (marker == markersDeque.firstOrNull()?.first ?: "filler") {
                 val poppedMarker = markersDeque.pop()
                 infoAboutEachMarkerMap[poppedMarker.second] = poppedMarker.first to 0
                 infoAboutEachMarkerMap[index] = marker to 1
             } else markersDeque.push(marker to index)
         }
-
         val interpreter = mapOf(
             "**" to listOf("<b>", "</b>"),
             "*" to listOf("<i>", "</i>"),
