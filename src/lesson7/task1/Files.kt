@@ -307,16 +307,6 @@ Suspendisse ~~et elit in enim tempus iaculis~~.
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-
-    fun Map<String, Int>.findMinPairInMap(): Pair<String, Int> {
-        var minPair = "" to Int.MAX_VALUE
-        for ((key, value) in this) {
-            if (value < minPair.second && value != -1)
-                minPair = key to value
-        }
-        return minPair
-    }
-
     fun String.makeReplacements(): String {
 
         val markerIndicesMap = mutableMapOf(
@@ -327,19 +317,21 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
         var startIndex: Int
 
         val infoAboutEachMarkerMap = mutableMapOf<Int, Pair<String, Int>>()
-        val stack = Stack<Pair<String, Int>>()
-        stack.push("cat toilet filler, kg" to 3)
+        val markersDeque = ArrayDeque<Pair<String, Int>>()
+        markersDeque.push("filler" to 0)
 
         while (markerIndicesMap.any { it.value != -1 }) {
-            val (marker, index) = markerIndicesMap.findMinPairInMap()
+            val (marker, index) = markerIndicesMap.filter { it.value != -1 }
+                .minByOrNull { it.value }!!.toPair()
             startIndex = index + marker.length
+
             for (key in markerIndicesMap.keys)
                 markerIndicesMap[key] = this.indexOf(key, startIndex)
-            if (marker == stack.peek().first) {
-                val poppedMarker = stack.pop()
+            if (marker == markersDeque.peek().first) {
+                val poppedMarker = markersDeque.pop()
                 infoAboutEachMarkerMap[poppedMarker.second] = poppedMarker.first to 0
                 infoAboutEachMarkerMap[index] = marker to 1
-            } else stack.push(marker to index)
+            } else markersDeque.push(marker to index)
         }
 
         val interpreter = mapOf(
@@ -349,7 +341,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
         )
         val resBuilder = StringBuilder()
         startIndex = 0
-        for ((index, infoPair) in infoAboutEachMarkerMap.toSortedMap()) {
+        for ((index, infoPair) in infoAboutEachMarkerMap.entries.sortedBy { it.key }) {
             val (marker, markerType) = infoPair
             resBuilder.append(this.substring(startIndex until index))
             resBuilder.append(interpreter[marker]?.get(markerType))
