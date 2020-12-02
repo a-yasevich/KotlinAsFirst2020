@@ -31,6 +31,14 @@ interface Matrix<E> {
 
     operator fun get(cell: Cell): E
 
+    fun getCellByValue(value: E): Cell
+
+    fun swap(a: Cell, b: Cell) {
+        val c = get(a)
+        set(a, get(b))
+        set(b, c)
+    }
+
     /**
      * Запись в ячейку.
      * Методы могут бросить исключение, если ячейка не существует
@@ -49,7 +57,7 @@ interface Matrix<E> {
  */
 fun <E> createMatrix(height: Int, width: Int, e: E): Matrix<E> {
     if (height <= 0 || width <= 0) throw IllegalArgumentException()
-    else return MatrixImpl(height, width, e)
+    return MatrixImpl(height, width, e)
 }
 
 /**
@@ -58,19 +66,19 @@ fun <E> createMatrix(height: Int, width: Int, e: E): Matrix<E> {
  * Реализация интерфейса "матрица"
  */
 class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : Matrix<E> {
+    private val defaultValue = e
     private val map = mutableMapOf<Cell, E>()
     private val isntInsideException = IndexOutOfBoundsException("Cell is not inside the matrix")
 
     init {
-        for (i in 1 until height)
-            for (j in 1 until width)
-                map[Cell(i, j)] = e
+        for (row in 0 until height)
+            for (column in 0 until width)
+                map[Cell(row, column)] = e
     }
 
     override fun get(cell: Cell): E {
-        if (cell.isInside())
-            return map[cell] ?: throw NullPointerException("Cell is empty")
-        else throw isntInsideException
+        if (!cell.isInside()) throw isntInsideException
+        return map[cell]!!
     }
 
     override fun set(cell: Cell, value: E) {
@@ -80,15 +88,20 @@ class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : M
     }
 
     private fun Cell.isInside() = this.row in 0 until height && this.column in 0 until width
-    fun getElements() = map
+    fun getElements() = map.entries
+    override fun getCellByValue(value: E): Cell {
+        for (row in 0 until height)
+            for (column in 0 until width)
+                if (map[Cell(row, column)] == value)
+                    return Cell(row, column)
+        return Cell(-1, -1)
+    }
 
     override fun equals(other: Any?) =
         other is MatrixImpl<*> &&
                 height == other.height &&
                 width == other.width &&
-                map == other.getElements()
-
-    override fun toString(): String = map.toString()
+                map.entries == other.getElements()
 
     override fun hashCode(): Int {
         var result = height
@@ -96,5 +109,19 @@ class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : M
         result = 31 * result + map.hashCode()
         return result
     }
+
+    override fun toString(): String {
+        val sb = StringBuilder()
+        sb.append("[")
+        for (row in 0 until height) {
+            sb.append("[")
+            for (column in 0 until width)
+                sb.append(this[row, column])
+            sb.append("]")
+        }
+        sb.append("]")
+        return sb.toString()
+    }
+
 }
 

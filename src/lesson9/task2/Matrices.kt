@@ -4,6 +4,8 @@ package lesson9.task2
 
 import lesson9.task1.Matrix
 import lesson9.task1.createMatrix
+import java.lang.IllegalArgumentException
+import java.lang.IllegalStateException
 
 // Все задачи в этом файле требуют наличия реализации интерфейса "Матрица" в Matrix.kt
 
@@ -119,7 +121,29 @@ fun <E> rotate(matrix: Matrix<E>): Matrix<E> = TODO()
  * 1 2 3
  * 3 1 2
  */
-fun isLatinSquare(matrix: Matrix<Int>): Boolean = TODO()
+fun isLatinSquare(matrix: Matrix<Int>): Boolean {
+    if (matrix.height != matrix.width)
+        return false
+    val values = mutableSetOf<Int>()
+    for (i in 1..matrix.height)
+        values.add(i)
+
+    for (row in 0 until matrix.height) {
+        val rowValues = mutableSetOf<Int>()
+        for (column in 0 until matrix.width)
+            rowValues.add(matrix[row, column])
+        if (rowValues != values)
+            return false
+    }
+    for (column in 0 until matrix.height) {
+        val columnValues = mutableSetOf<Int>()
+        for (row in 0 until matrix.width)
+            columnValues.add(matrix[row, column])
+        if (columnValues != values)
+            return false
+    }
+    return true
+}
 
 /**
  * Средняя (3 балла)
@@ -194,7 +218,21 @@ operator fun Matrix<Int>.unaryMinus(): Matrix<Int> = TODO(this.toString())
  * В противном случае бросить IllegalArgumentException.
  * Подробно про порядок умножения см. статью Википедии "Умножение матриц".
  */
-operator fun Matrix<Int>.times(other: Matrix<Int>): Matrix<Int> = TODO(this.toString())
+operator fun Matrix<Int>.times(other: Matrix<Int>): Matrix<Int> {
+    if (this.width != other.height) throw IllegalArgumentException()
+    val res = createMatrix(this.height, other.width, 0)
+
+    for (thisRow in 0 until this.height) {
+        for (otherColumn in 0 until other.width) {
+            var element = 0
+            for (thisColumn in 0 until this.width)
+                element += this[thisRow, thisColumn] * other[thisColumn, otherColumn]
+            res[thisRow, otherColumn] = element
+        }
+    }
+
+    return res
+}
 
 /**
  * Сложная (7 баллов)
@@ -245,7 +283,24 @@ fun canOpenLock(key: Matrix<Int>, lock: Matrix<Int>): Triple<Boolean, Int, Int> 
  * 0  4 13  6
  * 3 10 11  8
  */
-fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> = TODO()
+
+
+fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
+    fun isNeighbourWithEmpty(value: Int): Boolean {
+        val cell = matrix.getCellByValue(value)
+        val emptyCell = matrix.getCellByValue(0)
+        val rowDif = kotlin.math.abs(cell.row - emptyCell.row)
+        val columnDif = kotlin.math.abs(cell.column - emptyCell.column)
+        return ((rowDif == 1 || columnDif == 1) && rowDif != columnDif)
+
+    }
+    for (move in moves) {
+        if (!isNeighbourWithEmpty(move))
+            throw IllegalStateException("Impossible swap $move with 0")
+        matrix.swap(matrix.getCellByValue(move), matrix.getCellByValue(0))
+    }
+    return matrix
+}
 
 /**
  * Очень сложная (32 балла)
