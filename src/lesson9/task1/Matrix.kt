@@ -31,14 +31,6 @@ interface Matrix<E> {
 
     operator fun get(cell: Cell): E
 
-    fun getCellByValue(value: E): Cell
-
-    fun swap(a: Cell, b: Cell) {
-        val c = get(a)
-        set(a, get(b))
-        set(b, c)
-    }
-
     /**
      * Запись в ячейку.
      * Методы могут бросить исключение, если ячейка не существует
@@ -66,7 +58,6 @@ fun <E> createMatrix(height: Int, width: Int, e: E): Matrix<E> {
  * Реализация интерфейса "матрица"
  */
 class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : Matrix<E> {
-    private val defaultValue = e
     private val map = mutableMapOf<Cell, E>()
     private val isntInsideException = IndexOutOfBoundsException("Cell is not inside the matrix")
 
@@ -89,13 +80,6 @@ class MatrixImpl<E>(override val height: Int, override val width: Int, e: E) : M
 
     private fun Cell.isInside() = this.row in 0 until height && this.column in 0 until width
     fun getElements() = map.entries
-    override fun getCellByValue(value: E): Cell {
-        for (row in 0 until height)
-            for (column in 0 until width)
-                if (map[Cell(row, column)] == value)
-                    return Cell(row, column)
-        return Cell(-1, -1)
-    }
 
     override fun equals(other: Any?) =
         other is MatrixImpl<*> &&

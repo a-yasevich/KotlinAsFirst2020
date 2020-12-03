@@ -2,6 +2,7 @@
 
 package lesson9.task2
 
+import lesson9.task1.Cell
 import lesson9.task1.Matrix
 import lesson9.task1.createMatrix
 import java.lang.IllegalArgumentException
@@ -284,6 +285,19 @@ fun canOpenLock(key: Matrix<Int>, lock: Matrix<Int>): Triple<Boolean, Int, Int> 
  * 3 10 11  8
  */
 
+fun Matrix<Int>.getCellByValue(value: Int): Cell {
+    for (row in 0 until height)
+        for (column in 0 until width)
+            if (this[row, column] == value)
+                return Cell(row, column)
+    return Cell(-1, -1)
+}
+
+fun Matrix<Int>.swap(a: Cell, b: Cell) {
+    val c = get(a)
+    set(a, get(b))
+    set(b, c)
+}
 
 fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
     fun isNeighbourWithEmpty(value: Int): Boolean {
