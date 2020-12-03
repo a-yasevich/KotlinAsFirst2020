@@ -367,7 +367,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     }
     if (isOpen)
         fileWriter.write("</p>")
-    if (text.isEmpty())
+    if (text.trim().isEmpty())
         fileWriter.write("<p></p>")
     fileWriter.write("</body>")
     fileWriter.write("</html>")
