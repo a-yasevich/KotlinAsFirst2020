@@ -19,7 +19,7 @@ package lesson12.task1
  */
 class PhoneBook {
 
-    val phonesMap = mutableMapOf<String, MutableSet<String>>()
+    private val phonesMap = mutableMapOf<String, MutableSet<String>>()
 
     /**
      * Добавить человека.
@@ -60,12 +60,13 @@ class PhoneBook {
      */
 
     fun addPhone(name: String, phone: String): Boolean {
-        return if (!phonesMap.containsKey(name) || phonesMap[name]!!.contains(phone)
+        val personPhones = phonesMap[name]
+        return if (personPhones == null || phone !in personPhones
             || phonesMap.values.any { it.contains(phone) }
         )
             false
         else {
-            phonesMap[name]!!.add(phone)
+            personPhones.add(phone)
             true
         }
     }
@@ -77,11 +78,11 @@ class PhoneBook {
      * либо у него не было такого номера телефона.
      */
     fun removePhone(name: String, phone: String): Boolean {
-        return if (!phonesMap.containsKey(name) || !phonesMap[name]!!.contains(phone))
+        val personPhones = phonesMap[name]
+        return if (personPhones == null || phone !in personPhones)
             false
         else {
-            phonesMap[name]!!.remove(phone)
-            true
+            personPhones.remove(name)
         }
     }
 
@@ -89,11 +90,7 @@ class PhoneBook {
      * Вернуть все номера телефона заданного человека.
      * Если этого человека нет в книге, вернуть пустой список
      */
-    fun phones(name: String): Set<String> {
-        return if (!phonesMap.containsKey(name))
-            setOf()
-        else phonesMap[name]!!.toSet()
-    }
+    fun phones(name: String): Set<String> = phonesMap[name] ?: setOf()
 
     /**
      * Вернуть имя человека по заданному номеру телефона.
@@ -101,7 +98,7 @@ class PhoneBook {
      */
     fun humanByPhone(phone: String): String? {
         for ((human, phones) in phonesMap)
-            if (phones.contains(phone))
+            if (phone in phones)
                 return human
         return null
     }

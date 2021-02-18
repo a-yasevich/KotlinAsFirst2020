@@ -14,36 +14,37 @@ import kotlin.math.max
  *
  * Аргументы конструктора -- вещественная и мнимая часть числа.
  */
-class Complex(var re: Double, var im: Double) {
+class Complex {
+    val re: Double
+    val im: Double
+
+
+    constructor(re: Double, im: Double) {
+        this.re = re
+        this.im = im
+    }
 
     /**
      * Конструктор из вещественного числа
      */
-    constructor(x: Double) : this(x, 0.0)
+    constructor(x: Double) {
+        re = x
+        im = 0.0
+    }
 
     /**
      * Конструктор из строки вида x+yi
      */
-    constructor(s: String) : this(0.0, 0.0) {
-        fun String.convertIm() =
+    constructor(s: String) {
+        fun String.convertImPart() =
             if (this == "-i") -1.0
             else if (this == "i" || this == "+i") 1.0
             else this.dropLast(1).toDouble()
 
-        val delimiter = max(s.indexOf('+'), s.indexOf('-', 1))
-
-        if (delimiter == -1) {
-            if (s.contains('i')) {
-                im = s.convertIm()
-                re = 0.0
-            } else {
-                re = s.toDouble()
-                im = 0.0
-            }
-        } else {
-            im = s.substring(delimiter until s.length).convertIm()
-            re = s.substring(0 until delimiter).toDouble()
-        }
+        val rePart = Regex("""^((-|\+|^)[0-9.]+)(?![i])""").find(s)?.value
+        val imPart = Regex("""((-|\+|^)[0-9.]*i)""").find(s)?.value
+        re = rePart?.toDouble() ?: 0.0
+        im = imPart?.convertImPart() ?: 0.0
     }
 
     /**
