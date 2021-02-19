@@ -42,14 +42,7 @@ class PhoneBook {
      * и false, если человек с таким именем отсутствовал в телефонной книге
      * (во втором случае телефонная книга не должна меняться).
      */
-    fun removeHuman(name: String): Boolean {
-        return if (!phonesMap.containsKey(name))
-            false
-        else {
-            phonesMap.remove(name)
-            true
-        }
-    }
+    fun removeHuman(name: String): Boolean = phonesMap.remove(name, mutableSetOf())
 
     /**
      * Добавить номер телефона.
@@ -61,7 +54,7 @@ class PhoneBook {
 
     fun addPhone(name: String, phone: String): Boolean {
         val personPhones = phonesMap[name]
-        return if (personPhones == null || phone !in personPhones
+        return if (personPhones == null || phone in personPhones
             || phonesMap.values.any { it.contains(phone) }
         )
             false
@@ -82,7 +75,8 @@ class PhoneBook {
         return if (personPhones == null || phone !in personPhones)
             false
         else {
-            personPhones.remove(name)
+            personPhones.remove(phone)
+            true
         }
     }
 
