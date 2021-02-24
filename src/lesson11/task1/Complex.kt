@@ -3,7 +3,6 @@
 package lesson11.task1
 
 import lesson1.task1.sqr
-import kotlin.math.max
 
 /**
  * Класс "комплексное число".
@@ -37,14 +36,15 @@ class Complex {
      */
     constructor(s: String) {
         fun String.convertImPart() =
-            if (this == "-i") -1.0
-            else if (this == "i" || this == "+i") 1.0
-            else this.dropLast(1).toDouble()
+            if (this == "-i") "-1.0"
+            else if (this == "i" || this == "+i") "1.0"
+            else this.dropLast(1)
 
-        val rePart = Regex("""^((-|\+|^)[0-9.]+)(?![i])""").find(s)?.value
-        val imPart = Regex("""((-|\+|^)[0-9.]*i)""").find(s)?.value
-        re = rePart?.toDouble() ?: 0.0
-        im = imPart?.convertImPart() ?: 0.0
+        val matchedGroups = Regex("""([+|-]?[0-9.]+)?(?![i])([+|-]?[0-9.]*i)?""").find(s)?.groupValues!!.drop(1)
+        re = if (matchedGroups[0] == "") 0.0
+        else matchedGroups[0].toDouble()
+        im = if (matchedGroups[1] == "") 0.0
+        else matchedGroups[1].convertImPart().toDouble()
     }
 
     /**
