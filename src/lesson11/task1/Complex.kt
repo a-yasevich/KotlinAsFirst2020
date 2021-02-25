@@ -40,12 +40,13 @@ class Complex {
             else if (this == "i" || this == "+i") "1.0"
             else this.dropLast(1)
 
-        val matchedGroups = Regex("""([+|-]?[0-9.]+)?(?![i])([+|-]?[0-9.]*i)?""")
-            .find(s)?.groupValues!!.drop(1)
-        re = if (matchedGroups[0] == "") 0.0
-        else matchedGroups[0].toDouble()
-        im = if (matchedGroups[1] == "") 0.0
-        else matchedGroups[1].convertImPart().toDouble()
+        val matchedNumber = Regex("""([+|-]?[0-9.]+)?(?![i])([+|-]?[0-9.]*i)?""")
+            .find(s)
+            ?: throw IllegalArgumentException("Oops")
+        re = if (matchedNumber.groupValues[1] == "") 0.0
+        else matchedNumber.groupValues[1].toDouble()
+        im = if (matchedNumber.groupValues[2] == "") 0.0
+        else matchedNumber.groupValues[2].convertImPart().toDouble()
     }
 
     /**
